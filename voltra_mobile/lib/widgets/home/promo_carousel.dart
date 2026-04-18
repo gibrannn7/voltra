@@ -190,3 +190,4 @@ class _PromoData {
     required this.icon,
   });
 }
+  

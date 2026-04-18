@@ -23,9 +23,11 @@ class ProductRepository {
   /// Fetch products, optionally filtered by category_id.
   Future<ApiResponse<List<ProductModel>>> getProducts({int? categoryId}) async {
     try {
-      final response = await _api.get('/products', queryParameters: {
-        if (categoryId != null) 'category_id': categoryId,
-      });
+      final Map<String, dynamic> params = {};
+      if (categoryId != null) {
+        params['category_id'] = categoryId;
+      }
+      final response = await _api.get('/products', queryParameters: params);
       return ApiResponse.fromJson(
         response.data as Map<String, dynamic>,
         (data) => ProductModel.fromJsonList(data as List<dynamic>),

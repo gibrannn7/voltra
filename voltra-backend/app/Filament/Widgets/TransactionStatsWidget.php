@@ -11,7 +11,7 @@ class TransactionStatsWidget extends ChartWidget
 
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 1;
+    protected int|string|array $columnSpan = 1;
 
     protected static ?string $maxHeight = '280px';
 
@@ -29,20 +29,20 @@ class TransactionStatsWidget extends ChartWidget
     {
         $today = now()->startOfDay();
 
-        $success    = Transaction::where('status', Transaction::STATUS_SUCCESS)
+        $success = Transaction::where('status', Transaction::STATUS_SUCCESS)
             ->where('created_at', '>=', $today)->count();
-        $failed     = Transaction::where('status', Transaction::STATUS_FAILED)
+        $failed = Transaction::where('status', Transaction::STATUS_FAILED)
             ->where('created_at', '>=', $today)->count();
         $processing = Transaction::where('status', Transaction::STATUS_PROCESSING)
             ->where('created_at', '>=', $today)->count();
-        $pending    = Transaction::where('status', Transaction::STATUS_PENDING)
+        $pending = Transaction::where('status', Transaction::STATUS_PENDING)
             ->where('created_at', '>=', $today)->count();
 
         return [
             'datasets' => [
                 [
                     'label' => 'Transaksi',
-                    'data'  => [$success, $failed, $processing, $pending],
+                    'data' => [$success, $failed, $processing, $pending],
                     'backgroundColor' => [
                         '#10B981', // Success - Green
                         '#EF4444', // Failed - Red

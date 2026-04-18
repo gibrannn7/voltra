@@ -9,7 +9,7 @@ class ApiConfig {
   ApiConfig._();
 
   /// Base URL for Voltra API — change to production URL before release.
-  static const String baseUrl = 'http://10.0.2.2:8000/api/v1';
+  static const String baseUrl = 'https://8aeb-180-242-129-10.ngrok-free.app/api/v1';
   static const String prodBaseUrl = 'https://api.voltra.app/api/v1';
 
   static const Duration connectTimeout = Duration(seconds: 30);
@@ -141,6 +141,7 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String maintenance = '/maintenance';
   static const String forceUpdate = '/force-update';
+  static const String success = '/success';
 }
 
 // ─── Asset Paths ───────────────────────────────────────────

@@ -10,7 +10,7 @@ class RevenueWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     /**
      * Poll every 30 seconds for real-time updates.
@@ -53,13 +53,13 @@ class RevenueWidget extends BaseWidget
             ->sum('total_amount');
 
         return [
-            Stat::make('Revenue Hari Ini', 'Rp ' . number_format((float) $revenueToday, 0, ',', '.'))
+            Stat::make('Revenue Hari Ini', 'Rp '.number_format((float) $revenueToday, 0, ',', '.'))
                 ->description('Total transaksi sukses hari ini')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
                 ->chart([7, 3, 4, 5, 6, 3, 5, 3]),
 
-            Stat::make('Profit Hari Ini', 'Rp ' . number_format((float) $profitToday, 0, ',', '.'))
+            Stat::make('Profit Hari Ini', 'Rp '.number_format((float) $profitToday, 0, ',', '.'))
                 ->description('Margin dari admin markup')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
@@ -79,7 +79,7 @@ class RevenueWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-clock')
                 ->color($pendingNow > 0 ? 'warning' : 'gray'),
 
-            Stat::make('Revenue Bulan Ini', 'Rp ' . number_format((float) $revenueMonth, 0, ',', '.'))
+            Stat::make('Revenue Bulan Ini', 'Rp '.number_format((float) $revenueMonth, 0, ',', '.'))
                 ->description(now()->format('F Y'))
                 ->descriptionIcon('heroicon-m-calendar')
                 ->color('info'),

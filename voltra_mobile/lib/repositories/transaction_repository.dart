@@ -16,14 +16,19 @@ class TransactionRepository {
     String? promoCode,
   }) async {
     try {
+      final Map<String, dynamic> requestData = {
+        'product_id': productId,
+        'customer_number': customerNumber,
+        'payment_method': paymentMethod,
+      };
+
+      if (promoCode != null) {
+        requestData['promo_code'] = promoCode;
+      }
+
       final response = await _api.post(
         '/transactions',
-        data: {
-          'product_id': productId,
-          'customer_number': customerNumber,
-          'payment_method': paymentMethod,
-          if (promoCode != null) 'promo_code': promoCode,
-        },
+        data: requestData,
         extraHeaders: {
           'X-Pin': pin,
           'X-Idempotency-Key': idempotencyKey,
@@ -44,10 +49,12 @@ class TransactionRepository {
     String? status,
   }) async {
     try {
-      final response = await _api.get('/transactions', queryParameters: {
-        'page': page,
-        if (status != null) 'status': status,
-      });
+      final Map<String, dynamic> params = {'page': page};
+      if (status != null) {
+        params['status'] = status;
+      }
+
+      final response = await _api.get('/transactions', queryParameters: params);
       return ApiResponse.fromJson(
         response.data as Map<String, dynamic>,
         (data) => TransactionModel.fromJsonList(data as List<dynamic>),

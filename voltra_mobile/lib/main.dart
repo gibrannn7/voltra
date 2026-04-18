@@ -16,6 +16,11 @@ import 'screens/products/category_products_screen.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_client.dart';
 import 'services/storage_service.dart';
+import 'providers/connectivity_provider.dart';
+import 'providers/notification_provider.dart';
+import 'screens/notifications/notification_screen.dart';
+import 'screens/transactions/success_screen.dart';
+import 'screens/history/history_detail_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,10 +47,12 @@ class VoltraApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => WalletProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MaterialApp(
         title: AppStrings.appName,
@@ -62,6 +69,9 @@ class VoltraApp extends StatelessWidget {
           AppRoutes.maintenance: (_) => const MaintenanceScreen(),
           AppRoutes.categoryProducts: (_) => const CategoryProductsScreen(),
           AppRoutes.history: (_) => const HistoryScreen(),
+          AppRoutes.notifications: (_) => const NotificationScreen(),
+          AppRoutes.success: (_) => const SuccessScreen(),
+          AppRoutes.historyDetail: (_) => const HistoryDetailScreen(),
         },
       ),
     );

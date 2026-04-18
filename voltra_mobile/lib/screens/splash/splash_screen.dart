@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../config/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../repositories/system_repository.dart';
+import 'dart:io';
+import 'package:root_check/root_check.dart';
 
 /// Splash screen with:
 /// 1. Animated Voltra logo
@@ -30,19 +32,22 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
 
     // Status bar: transparent for immersive splash
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
 
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
 
-    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
-    );
+    _fadeAnim = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
 
     _scaleAnim = Tween<double>(begin: 0.8, end: 1).animate(
       CurvedAnimation(parent: _animController, curve: Curves.elasticOut),
@@ -58,10 +63,39 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _initialize() async {
     try {
+      // 2. Root Detection (Security Check)
+      bool isDeviceRooted = false;
+      if (Platform.isAndroid || Platform.isIOS) {
+        try {
+          isDeviceRooted = (await RootCheck.isRooted) ?? false;
+        } catch (e) {
+          isDeviceRooted = false; // Bypass jika package gagal jalan di simulator tertentu
+        }
+      }
+
+      if (isDeviceRooted && mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Keamanan Terdeteksi', style: TextStyle(fontWeight: FontWeight.bold)),
+            content: const Text('Aplikasi Voltra tidak dapat berjalan pada perangkat yang di-root atau dimodifikasi demi keamanan transaksi Anda.'),
+            actions: [
+              TextButton(
+                onPressed: () => exit(0),
+                child: const Text('Keluar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+        return; // Hentikan proses aplikasi jika di-root
+      }
+
       // 1. Check system settings (maintenance mode)
       final settings = await _systemRepo.getSettings();
       if (settings.isSuccess && settings.data != null) {
-        final isMaintenance = settings.data!['is_maintenance_mode'] as bool? ?? false;
+        final isMaintenance =
+            settings.data!['is_maintenance_mode'] as bool? ?? false;
         if (isMaintenance && mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.maintenance);
           return;
@@ -71,7 +105,8 @@ class _SplashScreenState extends State<SplashScreen>
       // 2. Version check
       final versionResult = await _systemRepo.checkVersion('1.0.0');
       if (versionResult.isSuccess && versionResult.data != null) {
-        final forceUpdate = versionResult.data!['force_update'] as bool? ?? false;
+        final forceUpdate =
+            versionResult.data!['force_update'] as bool? ?? false;
         if (forceUpdate && mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.forceUpdate);
           return;

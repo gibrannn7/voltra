@@ -43,7 +43,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
             return ListView.builder(
               padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: 8,
-              itemBuilder: (_, __) => const Padding(
+              itemBuilder: (context, index) => const Padding(
                 padding: EdgeInsets.only(bottom: AppSpacing.sm),
                 child: ShimmerCard(),
               ),

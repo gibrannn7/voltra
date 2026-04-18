@@ -87,7 +87,7 @@ class ShimmerGrid extends StatelessWidget {
         crossAxisSpacing: AppSpacing.sm,
       ),
       itemCount: itemCount,
-      itemBuilder: (_, __) => const Column(
+      itemBuilder: (context, index) => const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ShimmerLoading(height: 48, width: 48, borderRadius: 12),

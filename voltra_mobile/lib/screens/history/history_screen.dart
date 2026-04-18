@@ -72,7 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen>
             return ListView.builder(
               padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: 6,
-              itemBuilder: (_, __) => const Padding(
+              itemBuilder: (context, index) => const Padding(
                 padding: EdgeInsets.only(bottom: AppSpacing.sm),
                 child: ShimmerCard(),
               ),
