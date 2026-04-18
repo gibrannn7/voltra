@@ -4,6 +4,9 @@ library;
 
 import 'package:flutter/material.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 // ─── API Configuration ─────────────────────────────────────
 class ApiConfig {
   ApiConfig._();

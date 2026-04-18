@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/material.dart';
 import '../config/app_constants.dart';
+
 
 /// Singleton Dio HTTP client with Sanctum token interceptor,
 /// error normalization, and request/response logging.
@@ -103,9 +105,25 @@ class _AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // If 401, token expired — should trigger logout
     if (err.response?.statusCode == 401) {
       _storage.delete(key: ApiConfig.tokenKey);
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          content: Text('Sesi telah berakhir, silakan login kembali.', style: TextStyle(fontFamily: AppFonts.body)),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    } else if (err.response?.statusCode == 422) {
+      final msg = err.response?.data['meta']?['message'] ?? 'Data tidak valid';
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(msg, style: const TextStyle(fontFamily: AppFonts.body)),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+    } else if (err.response?.statusCode == 503) {
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(AppRoutes.maintenance, (route) => false);
     }
     handler.next(err);
   }

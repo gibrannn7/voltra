@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../repositories/wallet_repository.dart';
+import '../config/app_constants.dart';
 
 enum WalletState { initial, loading, loaded, error }
 
@@ -39,9 +40,24 @@ class WalletProvider extends ChangeNotifier {
     } else {
       _errorMessage = result.message;
       _balanceState = WalletState.error;
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(result.message ?? 'Gagal memuat saldo', style: const TextStyle(fontFamily: AppFonts.body)),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
 
     notifyListeners();
+  }
+
+  /// Pull-to-refresh logic that reloads both balance and mutation history.
+  Future<void> refreshAll() async {
+    await Future.wait([
+      fetchBalance(),
+      fetchMutations(),
+    ]);
   }
 
   /// Fetch mutation history.
@@ -57,6 +73,13 @@ class WalletProvider extends ChangeNotifier {
     } else {
       _errorMessage = result.message;
       _mutationState = WalletState.error;
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(result.message ?? 'Gagal memuat mutasi', style: const TextStyle(fontFamily: AppFonts.body)),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
 
     notifyListeners();

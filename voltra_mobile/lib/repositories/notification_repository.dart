@@ -1,37 +1,59 @@
 import 'package:dio/dio.dart';
-import '../models/api_response_model.dart';
-import '../models/notification_model.dart';
-import '../services/api_client.dart';
+import 'package:voltra_mobile/models/api_response_model.dart';
+import 'package:voltra_mobile/models/notification_model.dart';
+import 'package:voltra_mobile/services/api_client.dart';
 
+/// Repository for handling notification API calls.
 class NotificationRepository {
-  final ApiClient _api = ApiClient();
+  final ApiClient _apiClient = ApiClient();
 
-  Future<ApiResponse<List<NotificationModel>>> getNotifications({int page = 1}) async {
+  /// Retrieve paginated notifications from the server.
+  Future<List<NotificationModel>> getNotifications({int page = 1}) async {
     try {
-      final response = await _api.get('/notifications', queryParameters: {'page': page});
-      return ApiResponse.fromJson(
-        response.data as Map<String, dynamic>,
-        (data) => NotificationModel.fromJsonList(data as List<dynamic>),
+      final response = await _apiClient.dio.get(
+        '/notifications',
+        queryParameters: {'page': page},
       );
-    } on DioException catch (e) {
-      return _handleError(e);
+      
+      final apiResponse = ApiResponseModel.fromJson(response.data);
+      if (apiResponse.meta['status'] == 'success') {
+        final List<dynamic> data = apiResponse.data['data'] ?? [];
+        return data.map((json) => NotificationModel.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      if (e is DioException) {
+        throw Exception(e.response?.data['meta']?['message'] ?? 'Gagal mengambil notifikasi');
+      }
+      throw Exception('Terjadi kesalahan jaringan');
     }
   }
 
-  Future<ApiResponse<void>> markAsRead(String id) async {
+  /// Mark a specific notification as read.
+  Future<bool> markAsRead(int notificationId) async {
     try {
-      final response = await _api.patch('/notifications/$id/read');
-      return ApiResponse.fromJson(response.data as Map<String, dynamic>, (_) {});
-    } on DioException catch (e) {
-      return _handleError(e);
+      final response = await _apiClient.dio.post(
+        '/notifications/$notificationId/read',
+      );
+      
+      final apiResponse = ApiResponseModel.fromJson(response.data);
+      return apiResponse.meta['status'] == 'success';
+    } catch (e) {
+      return false;
     }
   }
 
-  ApiResponse<T> _handleError<T>(DioException e) {
-    return ApiResponse<T>(
-      code: e.response?.statusCode ?? 0,
-      status: 'error',
-      message: 'Gagal memuat notifikasi.',
-    );
+  /// Mark all notifications for the user as read.
+  Future<bool> markAllAsRead() async {
+    try {
+      final response = await _apiClient.dio.post(
+        '/notifications/read-all',
+      );
+      
+      final apiResponse = ApiResponseModel.fromJson(response.data);
+      return apiResponse.meta['status'] == 'success';
+    } catch (e) {
+      return false;
+    }
   }
 }
